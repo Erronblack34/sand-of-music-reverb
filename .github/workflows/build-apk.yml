@@ -9,7 +9,7 @@ permissions:
 
 jobs:
   build:
-    name: Build Android APK v0.7.0
+    name: Build Android APK v0.8.0
     runs-on: ubuntu-latest
 
     steps:
@@ -38,13 +38,12 @@ jobs:
         with:
           gradle-version: '8.13'
 
-      - name: Verify and extract v0.7.0 source
+      - name: Verify and extract v0.8.0 source
         shell: bash
         run: |
           set -euo pipefail
-
-          ARCHIVE="SandOfMusicReverb-v0.7.0.zip"
-          PROJECT="SandOfMusicReverb-v0.7.0"
+          ARCHIVE="SandOfMusicReverb-v0.8.0.zip"
+          PROJECT="SandOfMusicReverb-v0.8.0"
 
           echo "Repository root:"
           pwd
@@ -57,6 +56,7 @@ jobs:
 
           echo "Checking ZIP integrity..."
           unzip -t "$ARCHIVE"
+          unzip -Z1 "$ARCHIVE" | sed -n '1,100p'
           unzip -q "$ARCHIVE"
 
           required_files=(
@@ -69,27 +69,32 @@ jobs:
             "$PROJECT/app/src/main/java/com/sandofmusic/reverb/AudioRenderWorker.kt"
             "$PROJECT/app/src/main/java/com/sandofmusic/reverb/PlaybackService.kt"
             "$PROJECT/app/src/main/java/com/sandofmusic/reverb/LanguageCatalog.kt"
+            "$PROJECT/app/src/main/java/com/sandofmusic/reverb/GenreStyleProfiles.kt"
+            "$PROJECT/tools/v080_feature_smoke_test.py"
           )
 
           for file in "${required_files[@]}"; do
             if [[ ! -f "$file" ]]; then
               echo "::error::Required project file missing: $file"
-              find "$PROJECT" -maxdepth 8 -type f | sort | head -160 || true
+              find "$PROJECT" -maxdepth 8 -type f | sort | sed -n '1,160p' || true
               exit 1
             fi
           done
 
           echo "Source archive verified successfully."
 
+      - name: Run v0.8.0 feature smoke tests
+        working-directory: SandOfMusicReverb-v0.8.0
+        run: python3 tools/v080_feature_smoke_test.py
+
       - name: Build debug APK
-        working-directory: SandOfMusicReverb-v0.7.0
+        working-directory: SandOfMusicReverb-v0.8.0
         run: gradle --no-daemon --stacktrace assembleDebug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: Sand-of-Music-Reverb-v0.7.0-APK
-          path: SandOfMusicReverb-v0.7.0/app/build/outputs/apk/debug/app-debug.apk
+          name: Sand-of-Music-Reverb-v0.8.0-APK
+          path: SandOfMusicReverb-v0.8.0/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 14
- 
