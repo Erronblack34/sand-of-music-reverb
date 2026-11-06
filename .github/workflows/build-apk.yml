@@ -9,7 +9,7 @@ permissions:
 
 jobs:
   build:
-    name: Build Android APK v0.6.0
+    name: Build Android APK v0.6.5
     runs-on: ubuntu-latest
 
     steps:
@@ -38,32 +38,57 @@ jobs:
         with:
           gradle-version: '8.9'
 
-      - name: Verify and extract v0.6.0 source
+      - name: Verify and extract v0.6.5 source
         shell: bash
         run: |
           set -euo pipefail
 
-          ARCHIVE="SandOfMusicReverb-v0.6.0.zip"
-          PROJECT="SandOfMusicReverb-v0.6.0"
+          ARCHIVE="SandOfMusicReverb-v0.6.5.zip"
+          PROJECT="SandOfMusicReverb-v0.6.5"
 
-          test -f "$ARCHIVE"
+          echo "Repository root:"
+          pwd
+          ls -lah
+
+          if [ ! -f "$ARCHIVE" ]; then
+            echo "::error::Archive not found at repository root: $ARCHIVE"
+            exit 1
+          fi
+
+          echo "Checking archive integrity..."
           unzip -t "$ARCHIVE"
+
+          echo "Archive contents:"
+          unzip -Z1 "$ARCHIVE" | head -80
+
           unzip -q "$ARCHIVE"
 
-          test -f "$PROJECT/settings.gradle.kts"
-          test -f "$PROJECT/app/build.gradle.kts"
-          test -f "$PROJECT/app/src/main/java/com/sandofmusic/reverb/AudioRenderWorker.kt"
-          test -f "$PROJECT/app/src/main/java/com/sandofmusic/reverb/MediaPipeline.kt"
-          test -f "$PROJECT/app/src/main/java/com/sandofmusic/reverb/MainActivity.kt"
+          for file in \
+            "$PROJECT/settings.gradle.kts" \
+            "$PROJECT/app/build.gradle.kts" \
+            "$PROJECT/app/src/main/AndroidManifest.xml" \
+            "$PROJECT/app/src/main/java/com/sandofmusic/reverb/MainActivity.kt" \
+            "$PROJECT/app/src/main/java/com/sandofmusic/reverb/MediaPipeline.kt" \
+            "$PROJECT/app/src/main/java/com/sandofmusic/reverb/AudioRenderWorker.kt"; do
+            if [ ! -f "$file" ]; then
+              echo "::error::Required project file missing: $file"
+              echo "Extracted project tree:"
+              find "$PROJECT" -maxdepth 6 -type f | sort | head -120 || true
+              exit 1
+            fi
+          done
+
+          echo "Source archive verified successfully."
 
       - name: Build debug APK
-        working-directory: SandOfMusicReverb-v0.6.0
+        working-directory: SandOfMusicReverb-v0.6.5
         run: gradle --no-daemon --stacktrace assembleDebug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: Sand-of-Music-Reverb-v0.6.0-APK
-          path: SandOfMusicReverb-v0.6.0/app/build/outputs/apk/debug/app-debug.apk
+          name: Sand-of-Music-Reverb-v0.6.5-APK
+          path: SandOfMusicReverb-v0.6.5/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 14
+ 
