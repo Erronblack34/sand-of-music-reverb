@@ -9,7 +9,7 @@ permissions:
 
 jobs:
   build:
-    name: Build Android APK
+    name: Build Android APK v0.6.0
     runs-on: ubuntu-latest
 
     steps:
@@ -38,25 +38,34 @@ jobs:
         with:
           gradle-version: '8.9'
 
-      - name: Verify and extract v0.4.0 source
+      - name: Verify and extract v0.6.0 source
         shell: bash
         run: |
           set -euo pipefail
-          ARCHIVE="SandOfMusicReverb-v0.4.0-clean.zip"
+
+          ARCHIVE="SandOfMusicReverb-v0.6.0.zip"
+          PROJECT="SandOfMusicReverb-v0.6.0"
+
           test -f "$ARCHIVE"
           unzip -t "$ARCHIVE"
           unzip -q "$ARCHIVE"
-          test -f "SandOfMusicReverb-v0.4.0/settings.gradle.kts"
-          test -f "SandOfMusicReverb-v0.4.0/app/src/main/java/com/sandofmusic/reverb/RotaryKnobView.kt"
+
+          test -f "$PROJECT/settings.gradle.kts"
+          test -f "$PROJECT/app/build.gradle.kts"
+          test -f "$PROJECT/app/src/main/java/com/sandofmusic/reverb/AudioRenderWorker.kt"
+          test -f "$PROJECT/app/src/main/java/com/sandofmusic/reverb/MediaPipeline.kt"
+          test -f "$PROJECT/app/src/main/java/com/sandofmusic/reverb/MainActivity.kt"
+          test -f "$PROJECT/app/src/main/res/drawable-nodpi/loki_emblem.png"
 
       - name: Build debug APK
-        working-directory: SandOfMusicReverb-v0.4.0
+        working-directory: SandOfMusicReverb-v0.6.0
         run: gradle --no-daemon --stacktrace assembleDebug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: Sand-of-Music-Reverb-v0.4.0-APK
-          path: SandOfMusicReverb-v0.4.0/app/build/outputs/apk/debug/app-debug.apk
+          name: Sand-of-Music-Reverb-v0.6.0-APK
+          path: SandOfMusicReverb-v0.6.0/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 14
+ 
