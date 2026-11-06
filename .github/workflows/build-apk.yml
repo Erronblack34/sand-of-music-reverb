@@ -48,7 +48,7 @@ jobs:
 
           "$SDKMANAGER" --version
 
-          yes | "$SDKMANAGER" --sdk_root="$SDK_ROOT" --licenses
+          "$SDKMANAGER" --sdk_root="$SDK_ROOT" --licenses < <(yes)
 
           "$SDKMANAGER" --sdk_root="$SDK_ROOT" --install \
             "platforms;android-35" \
@@ -75,3 +75,4 @@ jobs:
           path: SandOfMusicReverb-v0.2.0/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 14
+
