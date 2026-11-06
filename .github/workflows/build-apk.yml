@@ -1,4 +1,5 @@
 
+
 name: Sand of Music Reverb - Android APK
 
 on:
@@ -41,9 +42,9 @@ jobs:
       - name: Verify and extract v0.3.0 source
         run: |
           set -e
-          test -f SandOfMusicReverb-v0.3.0-mobile.zip
-          unzip -t SandOfMusicReverb-v0.3.0-mobile.zip
-          unzip -q SandOfMusicReverb-v0.3.0-mobile.zip
+          test -f SandOfMusicReverb-v0.3.0-clean.zip
+          unzip -t SandOfMusicReverb-v0.3.0-clean.zip
+          unzip -q SandOfMusicReverb-v0.3.0-clean.zip
           test -f SandOfMusicReverb-v0.3.0/settings.gradle.kts
 
       - name: Build debug APK
