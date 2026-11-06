@@ -25,14 +25,9 @@ jobs:
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
-        with:
-          packages: platform-tools
 
       - name: Install Android platform
-        run: |
-          sdkmanager --install \
-            "platforms;android-35" \
-            "build-tools;35.0.0"
+        run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
@@ -42,10 +37,16 @@ jobs:
       - name: Verify and extract v0.3.0 source
         run: |
           set -e
-          test -f SandOfMusicReverb-v0.3.0-clean.zip
-          unzip -t SandOfMusicReverb-v0.3.0-clean.zip
-          unzip -q SandOfMusicReverb-v0.3.0-clean.zip
+          test -f SandOfMusicReverb-v0.3.0-mobile.zip
+          unzip -t SandOfMusicReverb-v0.3.0-mobile.zip
+          unzip -q SandOfMusicReverb-v0.3.0-mobile.zip
           test -f SandOfMusicReverb-v0.3.0/settings.gradle.kts
+
+      - name: Fix Kotlin source
+        run: |
+          FILE="SandOfMusicReverb-v0.3.0/app/src/main/java/com/sandofmusic/reverb/MainActivity.kt"
+          sed -i 's/singleLine = true/setSingleLine(true)/' "$FILE"
+          grep -n "setSingleLine(true)" "$FILE"
 
       - name: Build debug APK
         working-directory: SandOfMusicReverb-v0.3.0
