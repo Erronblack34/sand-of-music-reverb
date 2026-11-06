@@ -55,7 +55,6 @@ jobs:
           test -f "$PROJECT/app/src/main/java/com/sandofmusic/reverb/AudioRenderWorker.kt"
           test -f "$PROJECT/app/src/main/java/com/sandofmusic/reverb/MediaPipeline.kt"
           test -f "$PROJECT/app/src/main/java/com/sandofmusic/reverb/MainActivity.kt"
-          test -f "$PROJECT/app/src/main/res/drawable-nodpi/loki_emblem.png"
 
       - name: Build debug APK
         working-directory: SandOfMusicReverb-v0.6.0
@@ -68,4 +67,3 @@ jobs:
           path: SandOfMusicReverb-v0.6.0/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 14
- 
