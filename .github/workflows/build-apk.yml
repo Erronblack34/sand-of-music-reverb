@@ -1,4 +1,4 @@
-name: Sand of Music Reverb - Android APK v1.2.2
+name: Sand of Music Reverb - Android APK v1.25
 
 on:
   workflow_dispatch:
@@ -33,41 +33,45 @@ jobs:
         with:
           gradle-version: '8.13'
 
-      - name: Verify source archive
+      - name: Verify source archive and exact paths
         run: |
           set -euo pipefail
-          ARCHIVE="Sand of Music Reverb v1.2.2.zip"
-          PROJECT="SandOfMusicReverb-v1.2.2"
+          ARCHIVE="Sand_of_Music_Reverb_v1.25.zip"
+          PROJECT="SandOfMusicReverb-v1.25"
           test -f "$ARCHIVE"
           unzip -t "$ARCHIVE"
           unzip -q "$ARCHIVE"
           test -f "$PROJECT/settings.gradle.kts"
+          test -f "$PROJECT/app/build.gradle.kts"
           test -f "$PROJECT/app/src/main/java/com/sandofmusic/reverb/MainActivity.kt"
-          test -f "$PROJECT/app/src/main/java/com/sandofmusic/reverb/SpectrumVisualizerView.kt"
-          test -f "$PROJECT/app/src/main/java/com/sandofmusic/reverb/GenreStyleProfiles.kt"
+          test -f "$PROJECT/app/src/main/java/com/sandofmusic/reverb/MediaPipeline.kt"
           test -f "$PROJECT/app/src/main/java/com/sandofmusic/reverb/AudioRenderWorker.kt"
+          test -f "$PROJECT/app/src/main/java/com/sandofmusic/reverb/StemSplitWorker.kt"
+          test -f "$PROJECT/app/src/main/java/com/sandofmusic/reverb/WaveformView.kt"
+          test -f "$PROJECT/app/src/main/java/com/sandofmusic/reverb/SpectrumVisualizerView.kt"
+          grep -q 'versionCode = 125' "$PROJECT/app/build.gradle.kts"
+          grep -q 'versionName = "1.25"' "$PROJECT/app/build.gradle.kts"
 
       - name: Run source feature checks
-        working-directory: SandOfMusicReverb-v1.2.2
+        working-directory: SandOfMusicReverb-v1.25
         run: |
-          python3 tools/v080_feature_smoke_test.py
-          python3 tools/v122_feature_smoke_test.py
+          python3 tools/v125_feature_smoke_test.py
 
       - name: Build debug APK
-        working-directory: SandOfMusicReverb-v1.2.2
+        working-directory: SandOfMusicReverb-v1.25
         run: gradle --no-daemon --stacktrace assembleDebug
 
       - name: Rename APK for sharing
         run: |
           set -euo pipefail
           mkdir -p dist
-          cp SandOfMusicReverb-v1.2.2/app/build/outputs/apk/debug/app-debug.apk dist/SandOfMusicReverb_v1.2.2.apk
-          test -s dist/SandOfMusicReverb_v1.2.2.apk
+          cp SandOfMusicReverb-v1.25/app/build/outputs/apk/debug/app-debug.apk dist/SandOfMusicReverb_v1.25.apk
+          test -s dist/SandOfMusicReverb_v1.25.apk
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Sand-of-Music-Reverb-v1.2.2-APK
-          path: dist/SandOfMusicReverb_v1.2.2.apk
+          name: Sand-of-Music-Reverb-v1.25-APK
+          path: dist/SandOfMusicReverb_v1.25.apk
           if-no-files-found: error
           retention-days: 14
