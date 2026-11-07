@@ -1,4 +1,4 @@
-name: Sand of Music Reverb - Android APK v1.0
+name: Sand of Music Reverb - Android APK v1.2.0
 
 on:
   workflow_dispatch:
@@ -36,38 +36,38 @@ jobs:
       - name: Verify source archive
         run: |
           set -euo pipefail
-          ARCHIVE="SandOfMusicReverb-v1.0.0.zip"
-          PROJECT="SandOfMusicReverb-v1.0.0"
+          ARCHIVE="SandOfMusicReverb-v1.2.0.zip"
+          PROJECT="SandOfMusicReverb-v1.2.0"
           test -f "$ARCHIVE"
           unzip -t "$ARCHIVE"
           unzip -q "$ARCHIVE"
           test -f "$PROJECT/settings.gradle.kts"
           test -f "$PROJECT/app/src/main/java/com/sandofmusic/reverb/MainActivity.kt"
-          test -f "$PROJECT/app/src/main/java/com/sandofmusic/reverb/GenreCatalog.kt"
+          test -f "$PROJECT/app/src/main/java/com/sandofmusic/reverb/SpectrumVisualizerView.kt"
           test -f "$PROJECT/app/src/main/java/com/sandofmusic/reverb/GenreStyleProfiles.kt"
           test -f "$PROJECT/app/src/main/java/com/sandofmusic/reverb/AudioRenderWorker.kt"
 
       - name: Run source feature checks
-        working-directory: SandOfMusicReverb-v1.0.0
+        working-directory: SandOfMusicReverb-v1.2.0
         run: |
-          python3 tools/v100_feature_smoke_test.py
-          python3 tools/v090_feature_smoke_test.py
+          python3 tools/v080_feature_smoke_test.py
+          python3 tools/v120_feature_smoke_test.py
 
       - name: Build debug APK
-        working-directory: SandOfMusicReverb-v1.0.0
+        working-directory: SandOfMusicReverb-v1.2.0
         run: gradle --no-daemon --stacktrace assembleDebug
 
       - name: Rename APK for sharing
         run: |
           set -euo pipefail
           mkdir -p dist
-          cp SandOfMusicReverb-v1.0.0/app/build/outputs/apk/debug/app-debug.apk dist/SandOfMusicReverb_v1.0.apk
-          test -s dist/SandOfMusicReverb_v1.0.apk
+          cp SandOfMusicReverb-v1.2.0/app/build/outputs/apk/debug/app-debug.apk dist/SandOfMusicReverb_v1.2.apk
+          test -s dist/SandOfMusicReverb_v1.2.apk
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Sand-of-Music-Reverb-v1.0-APK
-          path: dist/SandOfMusicReverb_v1.0.apk
+          name: Sand-of-Music-Reverb-v1.2-APK
+          path: dist/SandOfMusicReverb_v1.2.apk
           if-no-files-found: error
-          retention-days: 14
+          retention-days: 14 
